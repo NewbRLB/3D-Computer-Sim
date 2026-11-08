@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D PC Building Simulator - Workspace</title>
+    
+    <!-- Bootstrap 5 & FontAwesome -->
+    <link href="../../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    
+    <!-- Custom Clean Stylesheet -->
+    <link href="css/simulator.css" rel="stylesheet">
+    <style>
+        /* Component Card Image Styling & Hover Spin Effect */
+        .part-slot-card {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .part-slot-card img.slot-image {
+            width: 75px;
+            height: 75px;
+            object-fit: contain;
+            margin-bottom: 8px;
+            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); /* Smooth spring-like rotation */
+        }
+
+        /* Trigger rotation and zoom only when hovering over the card */
+        .part-slot-card:hover img.slot-image {
+            transform: rotate(360deg) scale(1.1);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Exit Button -->
+    <a href="../menu/dashboard.html" class="exit-btn">
+        <i class="fa-solid fa-arrow-left"></i> Exit to Room
+    </a>
+
+    <!-- Top Navigation Hub -->
+    <div class="top-nav">
+        <button type="button" class="nav-card" data-bs-toggle="modal" data-bs-target="#shopModal">
+            <i class="fa-solid fa-store text-info"></i>
+            <span class="fw-semibold">Shop</span>
+        </button>
+        <button type="button" class="nav-card" data-bs-toggle="modal" data-bs-target="#inventoryModal">
+            <i class="fa-solid fa-box-archive text-warning"></i>
+            <span class="fw-semibold">Inventory</span>
+        </button>
+    </div>
+
+    <!-- On-Screen Controls Hint Overlay -->
+    <div id="info-overlay">
+        <h1>3D PC Workspace</h1>
+        <p>Click & drag to rotate view | Scroll to zoom</p>
+    </div>
+
+    <!-- 3D Canvas Container -->
+    <div id="canvas-container"></div>
+
+    <!-- ==========================================
+       SHOP MODAL (Database-Backed Catalog)
+       ========================================== -->
+    <div class="modal fade" id="shopModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered shop-modal-dialog">
+            <div class="shop-content">
+                
+                <!-- Top Header: Back Button & PARTS Banner -->
+				<div class="shop-top-header">
+                    <button type="button" class="shop-back-btn" onclick="closeShopModal()" data-bs-dismiss="modal">
+                        <i class="fa-solid fa-arrow-left me-2"></i> BACK
+                    </button>
+                    <div class="parts-title-banner">PARTS SHOP & CATALOG</div>
+                    <button type="button" class="btn btn-success fw-bold px-4" id="add-to-inv-btn" onclick="addSelectedToInventory()" disabled style="white-space: nowrap;">
+                        <i class="fa-solid fa-cart-plus me-2"></i> Add to Inventory
+                    </button>
+                </div>
+
+                <!-- Modal Body Layout -->
+                <div class="shop-body-layout">
+                    
+                    <!-- Sidebar Categories (Reordered & Unmerged) -->
+                    <div class="shop-sidebar" id="shopCategoryTabs">
+                        <button type="button" class="category-tab active" onclick="switchCategory('processors', this)">PROCESSORS</button>
+                        <button type="button" class="category-tab" onclick="switchCategory('coolers', this)">COOLERS</button>
+                        <button type="button" class="category-tab" onclick="switchCategory('motherboard', this)">MOTHERBOARD</button>
+                        <button type="button" class="category-tab" onclick="switchCategory('ram', this)">RAM</button>
+                        <button type="button" class="category-tab" onclick="switchCategory('storages', this)">STORAGE</button>
+                        <button type="button" class="category-tab" onclick="switchCategory('gpus', this)">GRAPHICS CARDS</button>
+                        <button type="button" class="category-tab" onclick="switchCategory('psus', this)">POWER SUPPLIES</button>
+                        <button type="button" class="category-tab" onclick="switchCategory('case', this)">CASE</button>
+                    </div>
+
+                    <!-- Catalog Content Grid -->
+                    <div class="shop-content-container" id="shop-container">
+                        <h5 id="category-heading" class="text-info fw-bold mb-4">Processors Catalog</h5>
+                        <div class="parts-grid" id="shop-items-grid">
+                            <!-- Dynamically loaded via MySQL API -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+       INVENTORY MODAL
+       ========================================== -->
+    <div class="modal fade" id="inventoryModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="shop-content" style="height: auto; min-height: 480px; padding: 24px;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="text-warning fw-bold m-0"><i class="fa-solid fa-box-archive me-2"></i> Your Inventory</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                
+                <!-- Inventory Items Grid Container -->
+                <div class="flex-grow-1 overflow-auto p-3" id="inventory-items-grid" style="background: rgba(18, 26, 45, 0.6); border: 2px solid rgba(255, 255, 255, 0.15); border-radius: 8px; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; max-height: 50vh;">
+                    <p class="text-muted text-center mt-5 w-100" id="empty-inventory-msg">Your inventory is currently empty. Select and add parts from the Shop!</p>
+                </div>
+
+                <div class="mt-3 d-flex justify-content-between align-items-center">
+                    <span class="text-info small fw-semibold" id="inventory-count">Total Items: 0</span>
+                    <button type="button" class="btn btn-outline-light btn-sm px-4" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vendor & Engine Scripts -->
+    <script src="../../assets/vendor/three/three.min.js"></script>
+    <script src="../../assets/vendor/three/OrbitControls.js"></script>
+    <script src="../../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="js/engine.js"></script>
+
+    <script>
+        // Global state for inventory and current selected part
+        let userInventory = [];
+        let currentlySelectedPart = null;
+
+        async function switchCategory(categoryKey, element) {
+            const tabs = document.querySelectorAll('.category-tab');
+            const heading = document.getElementById('category-heading');
+            const container = document.getElementById('shop-container');
+            const grid = document.getElementById('shop-items-grid');
+
+            if (!heading || !container || !grid) return;
+
+            tabs.forEach(tab => tab.classList.remove('active'));
+            if (element) {
+                element.classList.add('active');
+                heading.innerText = element.innerText + ' Catalog';
+            }
+
+            container.style.opacity = '0.5';
+            grid.innerHTML = '<p class="text-info">Loading components...</p>';
+
+            try {
+                const response = await fetch(`../../api/get_components.php?category=${encodeURIComponent(categoryKey)}`);
+                if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+                
+                const result = await response.json();
+                if (!result.success) throw new Error(result.message || 'Unable to load components.');
+
+                grid.innerHTML = '';
+                if (!result.data || result.data.length === 0) {
+                    grid.innerHTML = '<p class="text-muted">No components found in this category.</p>';
+                    return;
+                }
+
+                result.data.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'part-slot-card p-3';
+                    card.tabIndex = 0;
+
+                    // Pulls exact .gif matching the component name from its category folder
+                    const img = document.createElement('img');
+                    img.src = item.image || `../../assets/${categoryKey}/${item.name}.png`;
+                    img.alt = item.name;
+                    img.className = 'slot-image';
+                    
+                    // Fallback to default.png if the gif fails to load
+                    img.onerror = function() {
+                        this.src = `../../assets/${categoryKey}/default.png`;
+                    };
+
+                    const name = document.createElement('span');
+                    name.className = 'slot-title text-center px-1';
+                    name.style.fontSize = '0.8rem';
+                    name.textContent = item.name;
+
+                    const price = document.createElement('span');
+                    price.className = 'text-success small fw-bold mt-1';
+                    price.textContent = `$${item.price}`;
+
+                    card.append(img, name, price);
+
+                    card.addEventListener('click', () => {
+                        selectPart(card, item, categoryKey);
+                    });
+
+                    grid.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error('Shop fetch error:', error);
+                grid.innerHTML = '<p class="text-danger">Failed to load components.</p>';
+            } finally {
+                container.style.opacity = '1';
+            }
+        }
+
+        function selectPart(card, item, category) {
+            document.querySelectorAll('.part-slot-card').forEach(c => c.classList.remove('selected-part'));
+            card.classList.add('selected-part');
+            
+            currentlySelectedPart = { ...item, category: category };
+            
+            // Enable the Add to Inventory button
+            const addBtn = document.getElementById('add-to-inv-btn');
+            if (addBtn) addBtn.disabled = false;
+        }
+
+        function addSelectedToInventory() {
+            if (!currentlySelectedPart) return;
+
+            // Push to user inventory array
+            userInventory.push(currentlySelectedPart);
+            updateInventoryUI();
+
+            // Visual feedback
+            const addBtn = document.getElementById('add-to-inv-btn');
+            addBtn.innerHTML = '<i class="fa-solid fa-check me-2"></i> Added!';
+            addBtn.classList.remove('btn-success');
+            addBtn.classList.add('btn-outline-success');
+
+            setTimeout(() => {
+                addBtn.innerHTML = '<i class="fa-solid fa-cart-plus me-2"></i> Add to Inventory';
+                addBtn.classList.remove('btn-outline-success');
+                addBtn.classList.add('btn-success');
+            }, 1200);
+        }
+
+        function removeFromInventory(index) {
+            // Remove the item from the inventory array by index
+            userInventory.splice(index, 1);
+            // Refresh the inventory display and item count counter
+            updateInventoryUI();
+        }
+
+        function updateInventoryUI() {
+            const grid = document.getElementById('inventory-items-grid');
+            const countLabel = document.getElementById('inventory-count');
+            
+            countLabel.textContent = `Total Items: ${userInventory.length}`;
+
+            if (userInventory.length === 0) {
+                grid.innerHTML = '<p class="text-muted text-center mt-5 w-100" id="empty-inventory-msg">Your inventory is currently empty. Select and add parts from the Shop!</p>';
+                return;
+            }
+
+            grid.innerHTML = '';
+            userInventory.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'part-slot-card position-relative p-2';
+                div.style.height = '155px';
+                div.style.cursor = 'default';
+
+                div.innerHTML = `
+                    <!-- Delete / Remove Button -->
+                    <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 rounded-circle shadow-sm" onclick="removeFromInventory(${index})" title="Remove part" style="width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; padding: 0; z-index: 5;">
+                        <i class="fa-solid fa-trash" style="font-size: 0.7rem;"></i>
+                    </button>
+                    
+                    <img src="${item.image || `../../assets/${item.category}/${item.name}.png`}" alt="${item.name}" class="slot-image mt-2" style="width: 60px; height: 60px;" onerror="this.src='../../assets/${item.category}/default.png'">
+                    <span class="slot-title px-2 text-center" style="font-size: 0.72rem; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${item.name}</span>
+                    <span class="text-success small fw-bold mt-1">$${item.price}</span>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        function closeShopModal() {
+            const modalElement = document.getElementById('shopModal');
+            if (modalElement && window.bootstrap) {
+                bootstrap.Modal.getOrCreateInstance(modalElement).hide();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const defaultTab = document.querySelector('.category-tab.active');
+            if (defaultTab) {
+                switchCategory('processors', defaultTab);
+            }
+        });
+    </script>
+</body>
+</html>

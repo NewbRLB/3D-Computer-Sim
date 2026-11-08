@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D PC Building Simulator - Dashboard</title>
+    <link rel="stylesheet" href="../../assets/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../assets/vendor/fontawesome-free/css/all.min.css">
+    <style>
+        body {
+            background: url('../../assets/images/dashboard-room-2.png') no-repeat center center fixed;
+            background-size: cover;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Glassmorphism Floating Top Bar */
+        .top-nav {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        .nav-card {
+            background: rgba(30, 40, 60, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 238, 255, 0.3);
+            border-radius: 12px;
+            padding: 12px 22px;
+            color: #fff;
+            text-decoration: none;
+            
+            /* Perfectly centered flex contents */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .nav-card:hover {
+            transform: translateY(-3px);
+            background: rgba(0, 238, 255, 0.2);
+            border-color: #0ef;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(0, 238, 255, 0.5);
+        }
+
+        /* Bottom Left Logout Icon */
+        .logout-btn {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(30, 40, 60, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ff5555;
+            padding: 10px 18px;
+            border-radius: 10px;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+            z-index: 10;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 85, 85, 0.2);
+            color: #ff5555;
+            border-color: #ff5555;
+        }
+
+        /* Center Greeting Widget */
+        .greeting-widget {
+            position: absolute;
+            top: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: #ffffff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.7);
+            pointer-events: none; /* Allows clicks to pass through if needed */
+        }
+
+        /* Interactive Monitor Hotspot (Teleporter to 3D Game) */
+        .monitor-hotspot {
+            position: absolute;
+            /* Positioned directly over the monitor screen in the background image */
+            top: 41%;
+            left: 30.65%;
+            width: 37%;
+            height: 26.5%;
+            border-radius: 6px;
+            cursor: pointer;
+            z-index: 5;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Cyberpunk Hover Glow & Prompt */
+        .monitor-hotspot:hover {
+            background: rgba(0, 238, 255, 0.15);
+            border: 2px solid rgba(0, 238, 255, 0.8);
+            box-shadow: 0 0 30px rgba(0, 238, 255, 0.6);
+        }
+
+        .monitor-hotspot .launch-tooltip {
+            position: absolute;
+            background: rgba(10, 15, 30, 0.85);
+            border: 1px solid #0ef;
+            color: #0ef;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 0 15px rgba(0, 238, 255, 0.4);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .monitor-hotspot:hover .launch-tooltip {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Bottom Left Logout -->
+    <a href="../auth/login.html" class="logout-btn fw-bold">
+        <i class="fa-solid fa-power-off fs-5"></i> Logout
+    </a>
+
+    <!-- Top Center Quick Hub Nav -->
+    <div class="top-nav">
+        <a href="#shopModal" data-bs-toggle="modal" class="nav-card">
+            <i class="fa-solid fa-store fs-4 d-block text-info mb-1"></i>
+            <span class="small fw-semibold">Shop</span>
+        </a>
+        <a href="#achievementsModal" data-bs-toggle="modal" class="nav-card">
+            <i class="fa-solid fa-trophy fs-4 d-block text-warning mb-1"></i>
+            <span class="small fw-semibold">Achievements</span>
+        </a>
+    </div>
+
+    <!-- Interactive Monitor Hotspot (Click to enter 3D Simulator) -->
+    <!-- Change 'builder.html' to whatever file name your 3D game view uses! -->
+    <a href="../simulator/simulator.html" class="monitor-hotspot" title="Enter 3D PC Building Simulator">
+        <div class="launch-tooltip">
+            <i class="fa-solid fa-cube me-2"></i> Enter 3D Simulator
+        </div>
+    </a>
+
+    <!-- Center Live Time & Dynamic Greeting Display -->
+    <div class="greeting-widget">
+        <h1 class="display-3 fw-bold mb-0" id="live-clock">--:-- <span class="fs-4">--</span></h1>
+        <h3 class="fw-semibold mt-1" id="greeting-text">Good Morning!</h3>
+        <p class="text-light opacity-75">Keep going, you're doing great!</p>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="../../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Real-Time Clock & Dynamic Greeting Script -->
+    <script>
+        function updateClock() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            let ampm = hours >= 12 ? 'PM' : 'AM';
+
+            // Dynamic Greeting Logic
+            let greeting = "Good Morning!";
+            if (hours >= 12 && hours < 17) {
+                greeting = "Good Afternoon!";
+            } else if (hours >= 17 || hours < 5) {
+                greeting = "Good Evening!";
+            }
+            document.getElementById('greeting-text').innerText = greeting;
+
+            // Convert to 12-hour format
+            hours = hours % 12;
+            hours = hours ? hours : 12; // the hour '0' should be '12'
+
+            // Add leading zero to minutes if under 10
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+
+            // Inject time into the DOM
+            document.getElementById('live-clock').innerHTML = `${hours}:${minutes} <span class="fs-4">${ampm}</span>`;
+        }
+
+        // Run immediately on load, then update every second
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
+</body>
+</html>
