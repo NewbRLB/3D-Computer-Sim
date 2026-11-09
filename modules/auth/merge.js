@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 formData.append('email', email);
                 formData.append('password', password);
 
-                const response = await fetch('login_process.php', {
+                const response = await fetch('/api/login_process.php', {
                     method: 'POST',
                     body: formData
                 });
@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 formData.append('email', email);
                 formData.append('password', password);
 
-                const response = await fetch('signup_process.php', {
+                const response = await fetch('/api/signup_process.php', {
                     method: 'POST',
                     body: formData
                 });
@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 formData.append('email', email);
                 formData.append('password', password);
 
-                const response = await fetch('signup_process.php', {
+                const response = await fetch('/api/signup_process.php', {
                     method: 'POST',
                     body: formData
                 });
@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const formData = new FormData();
                 formData.append('email', email);
 
-                const response = await fetch('forgot_process.php', {
+                const response = await fetch('/api/forgot_process.php', {
                     method: 'POST',
                     body: formData
                 });
