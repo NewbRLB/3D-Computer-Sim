@@ -57,13 +57,17 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.textContent = 'Logging in...';
 
             try {
-                const formData = new FormData();
-                formData.append('email', email);
-                formData.append('password', password);
+                // Fixed: Switched to URLSearchParams to bypass Vercel 403 Forbidden blocks
+                const params = new URLSearchParams();
+                params.append('email', email);
+                params.append('password', password);
 
                 const response = await fetch('/api/login_process.php', {
                     method: 'POST',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: params
                 });
                 const data = await response.json();
 
@@ -102,14 +106,18 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.textContent = 'Registering...';
 
             try {
-                const formData = new FormData();
-                formData.append('username', username);
-                formData.append('email', email);
-                formData.append('password', password);
+                // Fixed: Switched to URLSearchParams to bypass Vercel 403 Forbidden blocks
+                const params = new URLSearchParams();
+                params.append('username', username);
+                params.append('email', email);
+                params.append('password', password);
 
                 const response = await fetch('/api/signup_process.php', {
                     method: 'POST',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: params
                 });
                 const data = await response.json();
 
@@ -158,14 +166,18 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.textContent = 'Registering...';
 
             try {
-                const formData = new FormData();
-                formData.append('username', username);
-                formData.append('email', email);
-                formData.append('password', password);
+                // Fixed: Switched to URLSearchParams to bypass Vercel 403 Forbidden blocks
+                const params = new URLSearchParams();
+                params.append('username', username);
+                params.append('email', email);
+                params.append('password', password);
 
                 const response = await fetch('/api/signup_process.php', {
                     method: 'POST',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: params
                 });
                 const data = await response.json();
 
@@ -202,12 +214,16 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.textContent = 'Sending...';
 
             try {
-                const formData = new FormData();
-                formData.append('email', email);
+                // Fixed: Switched to URLSearchParams to bypass Vercel 403 Forbidden blocks
+                const params = new URLSearchParams();
+                params.append('email', email);
 
                 const response = await fetch('/api/forgot_process.php', {
                     method: 'POST',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: params
                 });
                 const data = await response.json();
 
