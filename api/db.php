@@ -1,8 +1,9 @@
 <?php
-$host = '127.0.0.1';
-$db   = 'pc_simulator_db';
-$user = 'root';
-$pass = '';
+// Replace these placeholder strings with your actual Clever Cloud credentials
+$host = 'boun4onq59mye73e1puj-mysql.services.clever-cloud.com';         // e.g., u78x...-mysql.services.clever-cloud.com
+$db   = 'boun4onq59mye73e1puj';   // e.g., bl8x...
+$user = 'u6h2zfj3z4scdyvu';            // e.g., u78x...
+$pass = 'Y5iA7mxa8vn1nXF23I5eD';        // Your long secret password
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
